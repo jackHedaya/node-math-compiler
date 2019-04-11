@@ -1,10 +1,7 @@
 import Compiler from "../src/compiler";
+import { CharacterType } from "../src/compiler";
 
 var c = new Compiler();
-
-enum CharacterType {
-  EXPRESSION, WHITESPACE, OPERATOR, COMPARISON, ERROR
-}
 
 describe("Compiler", () => {
   test("should throw with start to equation", () => {
