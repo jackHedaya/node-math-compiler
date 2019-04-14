@@ -5,6 +5,7 @@ enum TokenType {
   EXPRESSION_START,
   EXPRESSION_CONTINUE,
   OPERATOR,
+  COMPARISON,
   ERROR
 }
 
@@ -18,8 +19,15 @@ class Token {
   }
 
   static generateLogic(characterType: CharacterType, map: object): TokenType {
+    if (!map) 
+      throw `Map not given, characterType = ${CharacterType[characterType]}`
+      
     const x = map[characterType];
     return x === undefined ? TokenType.ERROR : x;
+  }
+
+  public toString(): string {
+    return `{"type": ${TokenType[this.type]}, "value": ${this.value}}`
   }
 }
 
