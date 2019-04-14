@@ -1,7 +1,12 @@
 import Compiler from "../src/compiler";
 import { CharacterType } from "../src/compiler";
+import Token, { TokenType } from "../src/token";
 
-var c = new Compiler();
+var c: Compiler = new Compiler();
+
+afterEach(() => {
+  c = new Compiler();
+});
 
 describe("Compiler", () => {
   test("should throw with invalid start to equation", () => {
@@ -17,29 +22,47 @@ describe("Compiler", () => {
   });
 });
 
+describe("Compiler#compile", () => {
+  const expr = "2x + 3 = 4";
+  test("should properly compile '2x + 3 = 4'", () => {
+    const map = c.compile(expr);
+
+    expect(map).toEqual([
+      new Token(TokenType.COMPILER_START, null),
+      new Token(TokenType.EXPRESSION_START, "2"),
+      new Token(TokenType.EXPRESSION_CONTINUE, "x"),
+      new Token(TokenType.OPERATOR, "+"),
+      new Token(TokenType.EXPRESSION_START, "3"),
+      new Token(TokenType.COMPARISON, "="),
+      new Token(TokenType.EXPRESSION_START, "4"),
+    ]);
+  });
+});
+
 describe("Compiler#precompile", () => {
+  const pre = c["precompile"];
   test("should crash on invalid equation", () => {
-    expect(() => c["precompile"]("(( x + 2) = 3")).toThrow();
+    expect(() => pre("(( x + 2) = 3")).toThrow();
   });
 
   test("should not crash on valid equation", () => {
-    expect(() => c["precompile"]("(3x) - 4 = (2/3+1)")).not.toThrow();
+    expect(() => pre("(3x) - 4 = (2/3+1)")).not.toThrow();
   });
 
   test("should not crash on equation that contains no parenthesis", () => {
-    expect(() => c["precompile"]("2x + 4 = 6")).not.toThrow();
+    expect(() => pre("2x + 4 = 6")).not.toThrow();
   });
 
   test("should crash on equation that contains only '('", () => {
-    expect(() => c["precompile"]("(X + 3 = 0")).toThrow()
+    expect(() => pre("(X + 3 = 0")).toThrow();
   });
-  
+
   test("should crash on equation that contains only ')'", () => {
-    expect(() => c["precompile"](")3 + 4 = 3X")).toThrow()
+    expect(() => pre(")3 + 4 = 3X")).toThrow();
   });
 
   test("should add 0 to equation that starts with '-'", () => {
-    expect(c["precompile"]("-24x = 5")).toBe("0-24x = 5");
+    expect(pre("-24x = 5")).toBe("0 - 24x = 5".replace(/\s/g, ""));
   });
 });
 
