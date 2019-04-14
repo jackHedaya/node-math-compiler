@@ -3,7 +3,6 @@ import * as isLetter from "is-letter";
 
 enum CharacterType {
   EXPRESSION,
-  WHITESPACE,
   OPERATOR,
   COMPARISON,
   ERROR,
@@ -26,7 +25,6 @@ class Compiler {
 
   characterToType(char: string): CharacterType {
     if (parseInt(char) || isLetter(char)) return CharacterType.EXPRESSION;
-    if (char === " ") return CharacterType.WHITESPACE;
 
     const entries = Object.entries(this.characterMappings);
 
@@ -44,10 +42,15 @@ class Compiler {
     const openMatch = equation.match(/\(/g) || [];
     const closedMatch = equation.match(/\)/g) || [];
     if (openMatch.length !== closedMatch.length) {
-      throw "Invalid equation given."
+      throw "Invalid equation given.";
     }
 
+    // Add 0 to negative start expression
     if (edited[0] === "-") edited = "0" + edited;
+
+    // Remove all whitespace
+    edited = edited.replace(/\s/g, "");
+
     // Future mutations go here
 
     return edited;
@@ -60,6 +63,8 @@ class Compiler {
 
       this.map.push(newToken);
     }
+
+    return this.map;
   }
 
   generateToken(char: string, lastToken: Token): Token {
@@ -78,10 +83,12 @@ class Compiler {
 
         break;
 
+      case TokenType.EXPRESSION_CONTINUE:
       case TokenType.EXPRESSION_START:
         characterToType = {
           [CharacterType.EXPRESSION]: TokenType.EXPRESSION_CONTINUE,
           [CharacterType.OPERATOR]: TokenType.OPERATOR,
+          [CharacterType.COMPARISON]: TokenType.COMPARISON,
         };
 
         break;
@@ -89,20 +96,21 @@ class Compiler {
       case TokenType.OPERATOR:
         characterToType = {
           [CharacterType.EXPRESSION]: TokenType.EXPRESSION_START,
-          [CharacterType.OPERATOR]: TokenType.OPERATOR,
+          [CharacterType.OPERATOR]: TokenType.ERROR,
         };
 
         break;
 
-        // case TokenType.WHITESPACE:
-        //   characterToType = {
-        //     [CharacterType.EXPRESSION]: TokenType.
-        //   }
-
+      case TokenType.COMPARISON:
+        characterToType = {
+          [CharacterType.EXPRESSION]: TokenType.EXPRESSION_START,
+          [CharacterType.OPERATOR]: TokenType.ERROR,
+        };
     }
     if (!characterToType) {
-      console.log(CharacterType[characterType]); 
-      console.log(TokenType[lastToken.type])
+      throw `Character '${char}' failed during compilation with:\nCharacterType ${
+        CharacterType[characterType]
+      }\nLastToken: ${TokenType[lastToken.type]}, ${lastToken.value}`;
     }
     let newTokenType = Token.generateLogic(characterType, characterToType);
 
