@@ -4,7 +4,7 @@ import { CharacterType } from "../src/compiler";
 var c = new Compiler();
 
 describe("Compiler", () => {
-  test("should throw with start to equation", () => {
+  test("should throw with invalid start to equation", () => {
     expect(() => c.compile("@#@nd")).toThrow();
   });
 
