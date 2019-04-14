@@ -3,7 +3,7 @@ import { CharacterType } from "../src/compiler";
 
 describe("Token#generateLogic", () => {
   test("should return the correct token", () => {
-    expect.assertions(4);
+    expect.assertions(3);
 
     expect(
       Token.generateLogic(CharacterType.EXPRESSION, {
@@ -20,10 +20,5 @@ describe("Token#generateLogic", () => {
         [CharacterType.EXPRESSION]: TokenType.EXPRESSION_CONTINUE,
       }),
     ).toBe(TokenType.EXPRESSION_CONTINUE);
-    expect(
-      Token.generateLogic(CharacterType.WHITESPACE, {
-        [CharacterType.WHITESPACE]: TokenType.COMPILER_START
-      }),
-    ).toBe(TokenType.COMPILER_START);
   });
 });
