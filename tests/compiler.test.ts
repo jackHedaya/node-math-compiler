@@ -23,9 +23,8 @@ describe("Compiler", () => {
 });
 
 describe("Compiler#compile", () => {
-  const expr = "2x + 3 = 4";
   test("should properly compile '2x + 3 = 4'", () => {
-    const map = c.compile(expr);
+    const map = c.compile("2x + 3 = 4");
 
     expect(map).toEqual([
       new Token(TokenType.COMPILER_START, null),
@@ -35,6 +34,25 @@ describe("Compiler#compile", () => {
       new Token(TokenType.EXPRESSION_START, "3"),
       new Token(TokenType.COMPARISON, "="),
       new Token(TokenType.EXPRESSION_START, "4"),
+    ]);
+  });
+
+  test("should properly compile '(2x + 3)5 = 4/3'", () => {
+    const map = c.compile("(2x + 3)5 = 4/3");
+
+    expect(map).toEqual([
+      new Token(TokenType.COMPILER_START, null),
+      new Token(TokenType.EXPRESSION_START, "("),
+      new Token(TokenType.EXPRESSION_CONTINUE, "2"),
+      new Token(TokenType.EXPRESSION_CONTINUE, "x"),
+      new Token(TokenType.OPERATOR, "+"),
+      new Token(TokenType.EXPRESSION_START, "3"),
+      new Token(TokenType.EXPRESSION_CONTINUE, ")"),
+      new Token(TokenType.EXPRESSION_CONTINUE, "5"),
+      new Token(TokenType.COMPARISON, "="),
+      new Token(TokenType.EXPRESSION_START, "4"),
+      new Token(TokenType.OPERATOR, "/"),
+      new Token(TokenType.EXPRESSION_START, "3"),
     ]);
   });
 });
